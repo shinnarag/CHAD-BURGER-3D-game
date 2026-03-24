@@ -1,28 +1,45 @@
 import { Game } from './Game.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 배경음악 관리를 위한 로직
-    const bgm = document.getElementById('bgm');
-    bgm.volume = 0.4;
+let ytPlayer = null;
 
-    const tryPlayBGM = () => {
-        bgm.play().catch(error => {
-            console.log("브라우저 자동 재생 정책에 의해 미리 재생할 수 없습니다. 클릭 시 자동으로 재생됩니다.");
-        });
-    };
-    tryPlayBGM();
-
-    // 만약 보안 정책 때문에 자동 재생이 막혔다면, 아무 곳이나 클릭할 때 즉시 재생되도록 폴백 추가
-    document.body.addEventListener('click', () => {
-        if (bgm.paused) {
-            bgm.play().catch(e => { });
+window.onYouTubeIframeAPIReady = function() {
+    ytPlayer = new YT.Player('youtube-player', {
+        height: '0',
+        width: '0',
+        videoId: 'XPpY5pTq6aI',
+        playerVars: {
+            'autoplay': 0, // Browsers block auto-play until interaction
+            'controls': 0,
+            'disablekb': 1,
+            'fs': 0,
+            'loop': 1,
+            'playlist': 'XPpY5pTq6aI', 
+            'playsinline': 1
+        },
+        events: {
+            'onReady': (event) => {
+                const vol = document.getElementById('volume-slider');
+                if (vol) {
+                    event.target.setVolume(parseFloat(vol.value) * 100);
+                }
+            }
         }
-    }, { once: true });
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
 
     // Audio Control Logic
     const volumeSlider = document.getElementById('volume-slider');
     volumeSlider.addEventListener('input', (e) => {
-        bgm.volume = parseFloat(e.target.value);
+        let v = parseFloat(e.target.value);
+        if (v < 0.1) {
+            v = 0.1;
+            e.target.value = 0.1;
+        }
+        if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+            ytPlayer.setVolume(v * 100);
+        }
     });
 
     const game = new Game();
@@ -125,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Please enter your ID to start!");
             playerIdInput.focus();
             return;
+        }
+        
+        // Start YouTube Music upon user interaction
+        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            ytPlayer.playVideo();
         }
         
         game.start(playerId);
