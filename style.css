@@ -288,8 +288,10 @@ h2 {
         width: 60px !important;
     }
     #youtube-wrapper {
-        transform: scale(0.7);
-        transform-origin: top left;
+        position: absolute !important;
+        left: -9999px !important;
+        opacity: 0.01 !important;
+        pointer-events: none !important;
     }
 
     #btn-quit {

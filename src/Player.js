@@ -83,6 +83,9 @@ export class Player {
     }
 
     lock() {
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
         this.controls.lock();
     }
 
