@@ -169,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Start YouTube Music upon user interaction
         if (ytReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            ytPlayer.unMute();
             const state = ytPlayer.getPlayerState();
             if (state !== YT.PlayerState.PLAYING) {
                 ytPlayer.playVideo();
@@ -233,4 +234,16 @@ document.addEventListener('DOMContentLoaded', () => {
             game.triggerGameOver();
         });
     }
+
+    // 강력한 Fallback: 데스크탑 등에서 PointerLock 이후 클릭할 때 재생이 멈춰있으면 다시 시도
+    document.body.addEventListener('click', () => {
+        if (playRequested && ytReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            const state = ytPlayer.getPlayerState();
+            if (state !== YT.PlayerState.PLAYING) {
+                ytPlayer.unMute();
+                ytPlayer.playVideo();
+            }
+        }
+    });
+
 });
