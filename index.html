@@ -24,6 +24,7 @@
         window.ytPlayRequested = false;
 
         window.onYouTubeIframeAPIReady = function() {
+            if (window.ytReady) return;
             window.ytPlayer = new YT.Player('youtube-player', {
                 height: '112',
                 width: '200',
@@ -62,6 +63,16 @@
                 }
             });
         };
+
+        // 새로고침 시 확장프로그램 등에 의해 API Ready 콜백이 증발하는 현상을 복구하는 강력한 우회 로직
+        const checkYTApi = setInterval(() => {
+            if (window.YT && window.YT.Player && !window.ytReady) {
+                var el = document.getElementById('youtube-player');
+                if (el && el.tagName.toLowerCase() !== 'iframe') {
+                    window.onYouTubeIframeAPIReady();
+                }
+            }
+        }, 500);
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -70,8 +81,8 @@
             <span style="font-size: 1.5rem; margin-right: 5px; color: white; text-shadow: 2px 2px 0 #cc5b7b; cursor: default;">🔊</span>
             <input type="range" id="volume-slider" min="0.1" max="1.0" step="0.05" value="0.4" title="Volume Control">
         </div>
-        <div id="youtube-wrapper" style="border-radius: 8px; overflow: hidden; border: 2px solid white; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); background: black;">
-            <div id="youtube-player"></div>
+        <div id="youtube-wrapper" style="width: 200px; height: 112px; border-radius: 8px; overflow: hidden; border: 2px solid white; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); background: black;">
+            <div id="youtube-player" style="width: 100%; height: 100%;"></div>
         </div>
     </div>
 
