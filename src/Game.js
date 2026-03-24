@@ -10,6 +10,7 @@ export class Game {
         this.score = 0;
         this.lives = 3;
         this.currentPlayerId = null;
+        this.spawnHeart = false;
         
         this.combo = 0;
         this.comboTimer = 0.0;
@@ -79,9 +80,11 @@ export class Game {
         this.currentPlayerId = playerId;
         this.lives = 3;
         this.score = 0;
+        this.spawnHeart = false;
         this.combo = 0;
         this.comboTimer = 0.0;
         this.speedMultiplier = 1.0;
+        this.player.setBaseSpeed(60.0);
         this.player.setSpeedMultiplier(1.0);
 
         // HUD UI 명시적 초기화
@@ -137,12 +140,27 @@ export class Game {
         this.combo++;
         this.comboTimer = this.maxComboTimer;
         
+        const level = Math.min(10, Math.floor(this.score / 20));
+        this.player.setBaseSpeed(60.0 + level * 4.0);
+
+        if (this.score % 100 === 0 && this.score > 0) {
+            this.spawnHeart = true;
+        }
+
         // 속도는 콤보당 0.1씩 증가, 최대 1.5배 (총 2.5배)
         this.speedMultiplier = 1.0 + Math.min(this.combo * 0.1, 1.5);
         this.player.setSpeedMultiplier(this.speedMultiplier);
 
         if (this.onScoreUpdate) this.onScoreUpdate(this.score);
         if (this.onComboUpdate) this.onComboUpdate(this.combo);
+        this.playCollectSound();
+    }
+
+    collectHeart() {
+        if (this.lives < 3) {
+            this.lives++;
+            if (this.onLivesUpdate) this.onLivesUpdate(this.lives);
+        }
         this.playCollectSound();
     }
 

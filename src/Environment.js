@@ -186,7 +186,7 @@ export class Environment {
         this.starCount = 45;
         const geometry = new THREE.IcosahedronGeometry(0.5, 0);
         geometry.computeVertexNormals();
-        const material = new THREE.MeshLambertMaterial({ color: 0xffd700, emissive: 0xaa8800 });
+        const material = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x222222 });
 
         this.stars = new THREE.InstancedMesh(geometry, material, this.starCount);
         this.stars.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -195,6 +195,7 @@ export class Environment {
 
         this.starData = [];
         const dummy = new THREE.Object3D();
+        const _color = new THREE.Color();
 
         for (let i = 0; i < this.starCount; i++) {
             const yPos = 2.5 + Math.random() * 2.5;
@@ -205,17 +206,25 @@ export class Environment {
             dummy.updateMatrix();
             this.stars.setMatrixAt(i, dummy.matrix);
 
-            this.starData.push({ active: true, x: xPos, y: yPos, baseZ: zPos, rotation: 0 });
+            this.starData.push({ active: true, x: xPos, y: yPos, baseZ: zPos, rotation: 0, type: 'normal' });
+            _color.setHex(0xffd700);
+            this.stars.setColorAt(i, _color);
         }
+        this.stars.instanceColor.needsUpdate = true;
         this.scene.add(this.stars);
     }
 
     resetStars(playerZ) {
         const dummy = new THREE.Object3D();
+        const _color = new THREE.Color();
         for (let i = 0; i < this.starCount; i++) {
             const data = this.starData[i];
             data.active = true;
+            data.type = 'normal';
             data.baseZ = playerZ + 80 - i * 8 - Math.random() * 10;
+
+            _color.setHex(0xffd700);
+            this.stars.setColorAt(i, _color);
 
             dummy.position.set(data.x, data.y, data.baseZ);
             dummy.rotation.set(0, 0, 0);
@@ -224,6 +233,7 @@ export class Environment {
             this.stars.setMatrixAt(i, dummy.matrix);
         }
         this.stars.instanceMatrix.needsUpdate = true;
+        this.stars.instanceColor.needsUpdate = true;
     }
 
     createStarParticles() {
@@ -408,6 +418,9 @@ export class Environment {
         }
 
         if (this.stars) {
+            const _color = new THREE.Color();
+            let colorNeedsUpdate = false;
+
             for (let i = 0; i < this.starCount; i++) {
                 const data = this.starData[i];
 
@@ -417,6 +430,23 @@ export class Environment {
                     data.x = (Math.random() - 0.5) * 8;
                     data.y = 2.5 + Math.random() * 2.5;
                     data.active = true;
+                    
+                    data.type = 'normal';
+                    _color.setHex(0xffd700);
+
+                    if (this.game.score >= 30 && Math.random() < 0.2) {
+                        data.type = 'red';
+                        _color.setHex(0xff3333);
+                    }
+
+                    if (this.game.spawnHeart) {
+                        data.type = 'heart';
+                        _color.setHex(0xff66b2);
+                        this.game.spawnHeart = false;
+                    }
+
+                    this.stars.setColorAt(i, _color);
+                    colorNeedsUpdate = true;
                 } 
                 // 별이 플레이어 앞으로 한참 지나갔을 경우 (뒤로 걷는 중, 뒷쪽 스폰)
                 else if (data.baseZ < playerPos.z - 200) {
@@ -424,6 +454,11 @@ export class Environment {
                     data.x = (Math.random() - 0.5) * 8;
                     data.y = 2.5 + Math.random() * 2.5;
                     data.active = true;
+                    
+                    data.type = 'normal';
+                    _color.setHex(0xffd700);
+                    this.stars.setColorAt(i, _color);
+                    colorNeedsUpdate = true;
                 }
 
                 if (!data.active) continue;
@@ -438,14 +473,22 @@ export class Environment {
                 if (dummy.position.distanceTo(playerPos) < 2.0) {
                     data.active = false;
                     this.spawnStarParticles(dummy.position);
-                    this.game.collectStar();
                     dummy.position.y = -100;
+                    
+                    if (data.type === 'normal') {
+                        this.game.collectStar();
+                    } else if (data.type === 'red') {
+                        this.game.hitObstacle();
+                    } else if (data.type === 'heart') {
+                        this.game.collectHeart();
+                    }
                 }
 
                 dummy.updateMatrix();
                 this.stars.setMatrixAt(i, dummy.matrix);
             }
             this.stars.instanceMatrix.needsUpdate = true;
+            if (colorNeedsUpdate) this.stars.instanceColor.needsUpdate = true;
         }
 
         if (this.particles) {

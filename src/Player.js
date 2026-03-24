@@ -18,7 +18,7 @@ export class Player {
         this.moveRight = false;
         this.canJump = false;
 
-        this.speed = 46.0;
+        this.speed = 60.0;
         this.speedMultiplier = 1.0;
         this.friction = 10.0;
         this.gravity = 30.0;
@@ -82,6 +82,10 @@ export class Player {
 
     lock() {
         this.controls.lock();
+    }
+
+    setBaseSpeed(speed) {
+        this.speed = speed;
     }
 
     setSpeedMultiplier(mult) {
