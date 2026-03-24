@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Player } from './Player.js';
-import { Environment } from './Environment.js';
+import { Player } from './Player.js?v=7';
+import { Environment } from './Environment.js?v=7';
 
 export class Game {
     constructor() {
