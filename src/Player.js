@@ -40,10 +40,6 @@ export class Player {
                 case 'KeyA':
                     this.moveLeft = true;
                     break;
-                case 'ArrowDown':
-                case 'KeyS':
-                    this.moveBackward = true;
-                    break;
                 case 'ArrowRight':
                 case 'KeyD':
                     this.moveRight = true;
@@ -66,10 +62,6 @@ export class Player {
                 case 'ArrowLeft':
                 case 'KeyA':
                     this.moveLeft = false;
-                    break;
-                case 'ArrowDown':
-                case 'KeyS':
-                    this.moveBackward = false;
                     break;
                 case 'ArrowRight':
                 case 'KeyD':
@@ -102,6 +94,7 @@ export class Player {
 
         // PC 데스크탑과 모바일 모두 게임 시작 시점부터 무조건 앞으로 달리도록 강제
         this.moveForward = true;
+        this.moveBackward = false;
 
         if (this.isMobile) {
             this.controls.getObject().rotation.set(0, 0, 0);
