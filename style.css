@@ -269,18 +269,28 @@ h2 {
         right: 10px;
     }
     #score-display, #combo-display, #lives-display {
-        font-size: 1.2rem;
-        padding: 5px 10px;
-        border-radius: 10px;
-        border-width: 1.5px;
+        font-size: 1rem !important;
+        padding: 4px 8px !important;
+        border-radius: 8px !important;
+        border-width: 1px !important;
     }
     .heart {
-        margin-left: 2px;
+        margin-left: 2px !important;
+        font-size: 1rem !important;
     }
     
+    #audio-control {
+        top: 55px !important;
+        left: 10px !important;
+        padding: 5px 10px !important;
+    }
+    #audio-control input[type="range"] {
+        width: 60px !important;
+    }
+
     #btn-quit {
         position: absolute;
-        top: 60px;
+        top: 55px;
         right: 10px;
         background: rgba(255, 0, 0, 0.5);
         color: white;

@@ -19,7 +19,9 @@
 
 <body>
     <script src="https://www.youtube.com/iframe_api"></script>
-    <div id="youtube-player" style="position: absolute; width: 0; height: 0; top: -9999px; left: -9999px; visibility: hidden;"></div>
+    <div style="position: absolute; left: -9999px; top: -9999px; width: 200px; height: 200px; opacity: 0; pointer-events: none;">
+        <div id="youtube-player"></div>
+    </div>
 
     <div id="audio-control-container">
         <span style="font-size: 1.5rem; margin-right: 5px; color: white; text-shadow: 2px 2px 0 #cc5b7b; cursor: default;">🔊</span>

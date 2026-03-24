@@ -1,26 +1,47 @@
 import { Game } from './Game.js';
 
 let ytPlayer = null;
+let ytReady = false;
+let playRequested = false;
 
 window.onYouTubeIframeAPIReady = function() {
     ytPlayer = new YT.Player('youtube-player', {
-        height: '0',
-        width: '0',
+        height: '200',
+        width: '200',
         videoId: 'XPpY5pTq6aI',
         playerVars: {
-            'autoplay': 0, // Browsers block auto-play until interaction
+            'autoplay': 0, 
             'controls': 0,
             'disablekb': 1,
             'fs': 0,
             'loop': 1,
             'playlist': 'XPpY5pTq6aI', 
-            'playsinline': 1
+            'playsinline': 1,
+            'rel': 0,
+            'showinfo': 0,
+            'iv_load_policy': 3
         },
         events: {
             'onReady': (event) => {
+                ytReady = true;
                 const vol = document.getElementById('volume-slider');
                 if (vol) {
                     event.target.setVolume(parseFloat(vol.value) * 100);
+                }
+                if (playRequested) {
+                    event.target.playVideo();
+                }
+            },
+            'onStateChange': (event) => {
+                if (event.data === YT.PlayerState.ENDED) {
+                    event.target.playVideo(); 
+                }
+            },
+            'onError': (event) => {
+                console.error("YouTube Player Error Code:", event.data);
+                if (event.data === 101 || event.data === 150) {
+                    console.warn("This video owner does not allow embedding on other websites. Playback failed.");
+                    alert("해당 유튜브 영상은 저작권자가 '외부 웹사이트 재생'을 막아두어 재생할 수 없습니다.");
                 }
             }
         }
@@ -144,9 +165,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        playRequested = true;
+        
         // Start YouTube Music upon user interaction
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            ytPlayer.playVideo();
+        if (ytReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            const state = ytPlayer.getPlayerState();
+            if (state !== YT.PlayerState.PLAYING) {
+                ytPlayer.playVideo();
+            }
         }
         
         game.start(playerId);
