@@ -148,7 +148,7 @@ export class Environment {
         this.clouds = [];
         
         const geo = new THREE.SphereGeometry(1, 16, 16);
-        const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, flatShading: true });
+        const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, flatShading: true, fog: false });
         
         for (let i = 0; i < this.cloudCount; i++) {
             const group = new THREE.Group();
@@ -157,18 +157,18 @@ export class Environment {
             for (let j = 0; j < sphereCount; j++) {
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(
-                    (Math.random() - 0.5) * 6,
+                    (Math.random() - 0.5) * 8,
                     (Math.random() - 0.5) * 3,
-                    (Math.random() - 0.5) * 6
+                    (Math.random() - 0.5) * 8
                 );
-                const s = 3 + Math.random() * 4;
+                const s = 4 + Math.random() * 5;
                 mesh.scale.set(s, s * 0.6, s);
                 group.add(mesh);
             }
             
             group.position.set(
-                (Math.random() - 0.5) * 300,
-                50 + Math.random() * 20,
+                (Math.random() - 0.5) * 400,
+                70 + Math.random() * 30,
                 100 - Math.random() * 400
             );
             

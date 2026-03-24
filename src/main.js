@@ -109,14 +109,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         game.start(playerId);
-        ui.classList.add('hidden');
-        hud.classList.remove('hidden');
+        // Do not hide UI here, let pointerlockchange handle it on success
     });
 
     document.addEventListener('pointerlockchange', () => {
-        if (document.pointerLockElement !== document.body && game.isRunning) {
+        if (document.pointerLockElement === document.body) {
+            // Lock activated successfully
+            ui.classList.add('hidden');
+            hud.classList.remove('hidden');
+        } else {
             // ESC key triggers Game Over now
-            game.triggerGameOver();
+            if (game.isRunning) {
+                game.triggerGameOver();
+            }
         }
+    });
+
+    document.addEventListener('pointerlockerror', () => {
+        // Browser rejected pointer lock (usually because of rapid requests)
+        game.isRunning = false;
+        ui.classList.remove('hidden');
+        hud.classList.add('hidden');
+        // Do not switch screen completely, just inform the user
+        console.warn("Pointer lock rejected by browser. Please wait a second before clicking again.");
     });
 });
