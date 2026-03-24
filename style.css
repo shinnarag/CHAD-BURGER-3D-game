@@ -282,10 +282,13 @@ h2 {
     #audio-control-container {
         top: 55px !important;
         left: 10px !important;
-        padding: 5px 10px !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        pointer-events: none !important;
     }
-    #audio-control-container input[type="range"] {
-        width: 60px !important;
+    #audio-control-container > div:first-child {
+        display: none !important;
     }
     #youtube-wrapper {
         position: absolute !important;
