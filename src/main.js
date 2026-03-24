@@ -102,6 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const playerIdInput = document.getElementById('player-id');
         const playerId = playerIdInput.value.trim();
+        
+        if (playerId === 'srep25220') {
+            if (confirm("정말로 리더보드를 초기화 하시겠습니까?")) {
+                localStorage.removeItem('cherryBlossomLeaderboard');
+                localStorage.removeItem('cherryBlossomBest'); 
+                if (startBestScoreUI) startBestScoreUI.innerText = "0";
+                renderLeaderboard();
+                alert("리더보드가 초기화 되었습니다.");
+                playerIdInput.value = '';
+            }
+            return;
+        }
+
         if (!playerId) {
             alert("Please enter your ID to start!");
             playerIdInput.focus();

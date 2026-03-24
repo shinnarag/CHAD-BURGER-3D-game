@@ -148,10 +148,11 @@ export class Environment {
         this.clouds = [];
         
         const geo = new THREE.SphereGeometry(1, 16, 16);
-        const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, flatShading: true, fog: false });
         
         for (let i = 0; i < this.cloudCount; i++) {
             const group = new THREE.Group();
+            const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, fog: false });
+            group.userData.mat = mat;
             
             const sphereCount = 5 + Math.floor(Math.random() * 5);
             for (let j = 0; j < sphereCount; j++) {
@@ -173,9 +174,7 @@ export class Environment {
             );
             
             // Randomly drift left or right slowly
-            group.userData = {
-                vx: (Math.random() * 1.5 + 0.5) * (Math.random() < 0.5 ? 1 : -1)
-            };
+            group.userData.vx = (Math.random() * 1.5 + 0.5) * (Math.random() < 0.5 ? 1 : -1);
             
             this.scene.add(group);
             this.clouds.push(group);
@@ -363,10 +362,19 @@ export class Environment {
                 if (cloud.position.z > playerPos.z + 150) {
                     cloud.position.z -= 350;
                     cloud.position.x = playerPos.x + (Math.random() - 0.5) * 300;
+                    cloud.userData.mat.opacity = 0;
                 } else if (cloud.position.z < playerPos.z - 250) {
                     cloud.position.z += 350;
                     cloud.position.x = playerPos.x + (Math.random() - 0.5) * 300;
+                    cloud.userData.mat.opacity = 0;
                 }
+
+                // Opacity fade in based on distance
+                const dist = cloud.position.distanceTo(playerPos);
+                let targetOp = 1.0 - (dist - 150) / 200;
+                if (targetOp < 0) targetOp = 0;
+                if (targetOp > 0.95) targetOp = 0.95;
+                cloud.userData.mat.opacity = targetOp;
             }
         }
 
