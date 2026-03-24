@@ -34,7 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const hud = document.getElementById('hud');
     const scoreUI = document.getElementById('score');
     const finalScoreUI = document.getElementById('final-score');
-    const livesUI = document.getElementById('lives');
+    
+    const life1 = document.getElementById('life-1');
+    const life2 = document.getElementById('life-2');
+    const life3 = document.getElementById('life-3');
     
     const startBestScoreUI = document.getElementById('start-best-score');
     const comboDisplay = document.getElementById('combo-display');
@@ -47,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         lbList.innerHTML = '';
         lb.forEach((entry, idx) => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>#${idx+1} ${entry.id}</span><span>${entry.score} 🌟</span>`;
+            const timeStr = entry.time ? ` (${Math.floor(entry.time)}s)` : '';
+            li.innerHTML = `<span>#${idx+1} ${entry.id}</span><span>${entry.score} 🌟${timeStr}</span>`;
             lbList.appendChild(li);
         });
         
@@ -65,7 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     game.onLivesUpdate = (lives) => {
-        if(livesUI) livesUI.innerText = lives;
+        if(life1) life1.className = lives >= 1 ? 'heart' : 'heart heart-lost';
+        if(life2) life2.className = lives >= 2 ? 'heart' : 'heart heart-lost';
+        if(life3) life3.className = lives >= 3 ? 'heart' : 'heart heart-lost';
     };
 
     game.onComboUpdate = (combo) => {

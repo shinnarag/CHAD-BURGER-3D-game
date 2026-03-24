@@ -11,6 +11,7 @@ export class Game {
         this.lives = 3;
         this.currentPlayerId = null;
         this.spawnHeart = false;
+        this.playTime = 0.0;
         
         this.combo = 0;
         this.comboTimer = 0.0;
@@ -81,6 +82,7 @@ export class Game {
         this.lives = 3;
         this.score = 0;
         this.spawnHeart = false;
+        this.playTime = 0.0;
         this.combo = 0;
         this.comboTimer = 0.0;
         this.speedMultiplier = 1.0;
@@ -202,7 +204,7 @@ export class Game {
         if (this.score > 0) {
             let lbStr = localStorage.getItem('cherryBlossomLeaderboard');
             let lb = lbStr ? JSON.parse(lbStr) : [];
-            lb.push({ id: this.currentPlayerId, score: this.score });
+            lb.push({ id: this.currentPlayerId, score: this.score, time: this.playTime });
             lb.sort((a, b) => b.score - a.score);
             lb = lb.slice(0, 100);
             localStorage.setItem('cherryBlossomLeaderboard', JSON.stringify(lb));
@@ -227,6 +229,7 @@ export class Game {
             }
 
             this.player.update(delta);
+            this.playTime += delta;
         } else {
             this.camera.position.z -= 3.0 * delta;
         }

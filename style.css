@@ -240,3 +240,15 @@ h2 {
     background: rgba(255, 183, 197, 0.8); 
     border-radius: 4px;
 }
+
+.heart {
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.heart-lost {
+    opacity: 0.3;
+    filter: grayscale(100%);
+    transform: scale(0.8);
+}
