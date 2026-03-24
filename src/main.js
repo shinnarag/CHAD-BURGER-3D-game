@@ -6,12 +6,12 @@ let playRequested = false;
 
 window.onYouTubeIframeAPIReady = function() {
     ytPlayer = new YT.Player('youtube-player', {
-        height: '200',
+        height: '112',
         width: '200',
         videoId: 'XPpY5pTq6aI',
         playerVars: {
             'autoplay': 0, 
-            'controls': 0,
+            'controls': 1,
             'disablekb': 1,
             'fs': 0,
             'loop': 1,

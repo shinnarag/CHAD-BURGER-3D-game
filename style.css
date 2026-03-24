@@ -279,13 +279,17 @@ h2 {
         font-size: 1rem !important;
     }
     
-    #audio-control {
+    #audio-control-container {
         top: 55px !important;
         left: 10px !important;
         padding: 5px 10px !important;
     }
-    #audio-control input[type="range"] {
+    #audio-control-container input[type="range"] {
         width: 60px !important;
+    }
+    #youtube-wrapper {
+        transform: scale(0.7);
+        transform-origin: top left;
     }
 
     #btn-quit {
