@@ -4,6 +4,7 @@ let ytPlayer = null;
 let ytReady = false;
 let playRequested = false;
 
+// 1. YouTube 주입 코드를 모듈 최상단에서 우선순위로 선언
 window.onYouTubeIframeAPIReady = function() {
     ytPlayer = new YT.Player('youtube-player', {
         height: '112',
@@ -47,6 +48,12 @@ window.onYouTubeIframeAPIReady = function() {
         }
     });
 };
+
+// 2. 동적으로 스크립트 로드 (race condition 방지, 구글 권장 방식)
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 document.addEventListener('DOMContentLoaded', () => {
 
