@@ -19,24 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, { once: true });
 
-    // Audio Control Toggle Logic
-    const audioBtn = document.getElementById('audio-control');
-    const toggleMute = () => {
-        bgm.muted = !bgm.muted;
-        audioBtn.innerText = bgm.muted ? '🔇' : '🔊';
-        audioBtn.style.opacity = bgm.muted ? '0.4' : '0.8';
-    };
-
-    audioBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 버튼 클릭이 게임 시작으로 이어지지 않도록 방지
-        toggleMute();
-    });
-
-    document.addEventListener('keydown', (e) => {
-        // 단축키 M으로 똑같이 켜고 끄기 가능
-        if (e.code === 'KeyM') {
-            toggleMute();
-        }
+    // Audio Control Logic
+    const volumeSlider = document.getElementById('volume-slider');
+    volumeSlider.addEventListener('input', (e) => {
+        bgm.volume = parseFloat(e.target.value);
     });
 
     const game = new Game();
@@ -48,15 +34,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const hud = document.getElementById('hud');
     const scoreUI = document.getElementById('score');
     const finalScoreUI = document.getElementById('final-score');
-    const timeUI = document.getElementById('time');
+    const livesUI = document.getElementById('lives');
     
     const startBestScoreUI = document.getElementById('start-best-score');
-    const finalBestScoreUI = document.getElementById('final-best-score');
     const comboDisplay = document.getElementById('combo-display');
     const comboUI = document.getElementById('combo');
 
-    // Init best score
-    if(startBestScoreUI) startBestScoreUI.innerText = game.bestScore;
+    const renderLeaderboard = () => {
+        const lbStr = localStorage.getItem('cherryBlossomLeaderboard');
+        const lb = lbStr ? JSON.parse(lbStr) : [];
+        const lbList = document.getElementById('leaderboard-list');
+        lbList.innerHTML = '';
+        lb.forEach((entry, idx) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>#${idx+1} ${entry.id}</span><span>${entry.score} 🌟</span>`;
+            lbList.appendChild(li);
+        });
+        
+        if(lb.length > 0 && startBestScoreUI) {
+            startBestScoreUI.innerText = lb[0].score;
+        }
+    };
+    renderLeaderboard();
 
     loading.classList.add('hidden');
 
@@ -65,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreUI.innerText = score;
     };
 
-    game.onTimeUpdate = (time) => {
-        timeUI.innerText = Math.ceil(time);
+    game.onLivesUpdate = (lives) => {
+        if(livesUI) livesUI.innerText = lives;
     };
 
     game.onComboUpdate = (combo) => {
@@ -82,31 +81,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    game.onGameOver = (score, bestScore) => {
+    game.onGameOver = (score) => {
         document.exitPointerLock();
         hud.classList.add('hidden');
         ui.classList.remove('hidden');
         startScreen.classList.add('hidden');
         gameOverScreen.classList.remove('hidden');
         finalScoreUI.innerText = score;
-        if(finalBestScoreUI) finalBestScoreUI.innerText = bestScore;
-        if(startBestScoreUI) startBestScoreUI.innerText = bestScore;
+        renderLeaderboard();
     };
 
-    ui.addEventListener('click', () => {
-        game.start();
+    ui.addEventListener('click', (e) => {
+        if (e.target.id === 'volume-slider') return; // Ignore clicks on the volume slider
+        
+        if (!gameOverScreen.classList.contains('hidden')) {
+            gameOverScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            return;
+        }
+
+        const playerIdInput = document.getElementById('player-id');
+        const playerId = playerIdInput.value.trim();
+        if (!playerId) {
+            alert("Please enter your ID to start!");
+            playerIdInput.focus();
+            return;
+        }
+        
+        game.start(playerId);
         ui.classList.add('hidden');
         hud.classList.remove('hidden');
     });
 
     document.addEventListener('pointerlockchange', () => {
         if (document.pointerLockElement !== document.body && game.isRunning) {
-            // Paused manually (ESC)
-            ui.classList.remove('hidden');
-            startScreen.classList.remove('hidden');
-            gameOverScreen.classList.add('hidden');
-            hud.classList.add('hidden');
-            game.pause();
+            // ESC key triggers Game Over now
+            game.triggerGameOver();
         }
     });
 });

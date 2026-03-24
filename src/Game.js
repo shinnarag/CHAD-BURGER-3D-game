@@ -8,18 +8,16 @@ export class Game {
         this.isRunning = false;
 
         this.score = 0;
-        this.timeLeft = 60.0; // 1 minute
+        this.lives = 3;
+        this.currentPlayerId = null;
         
         this.combo = 0;
         this.comboTimer = 0.0;
         this.maxComboTimer = 3.0; // 3초 내에 먹어야 콤보 유지
         this.speedMultiplier = 1.0;
-        
-        let savedBest = localStorage.getItem('cherryBlossomBest');
-        this.bestScore = savedBest ? parseInt(savedBest) : 0;
 
         this.onScoreUpdate = null;
-        this.onTimeUpdate = null;
+        this.onLivesUpdate = null;
         this.onComboUpdate = null;
         this.onGameOver = null;
 
@@ -77,9 +75,9 @@ export class Game {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    start() {
-        // 일시정지 후 돌아와도 항상 0초, 점수 0에서 새로 시작!
-        this.timeLeft = 60.0;
+    start(playerId) {
+        this.currentPlayerId = playerId;
+        this.lives = 3;
         this.score = 0;
         this.combo = 0;
         this.comboTimer = 0.0;
@@ -88,7 +86,7 @@ export class Game {
 
         // HUD UI 명시적 초기화
         if (this.onScoreUpdate) this.onScoreUpdate(this.score);
-        if (this.onTimeUpdate) this.onTimeUpdate(this.timeLeft);
+        if (this.onLivesUpdate) this.onLivesUpdate(this.lives);
         if (this.onComboUpdate) this.onComboUpdate(this.combo);
 
         this.environment.resetStars(this.camera.position.z);
@@ -149,6 +147,9 @@ export class Game {
     }
 
     hitObstacle() {
+        this.lives--;
+        if (this.onLivesUpdate) this.onLivesUpdate(this.lives);
+
         this.combo = 0;
         this.comboTimer = 0.0;
         this.speedMultiplier = 0.5; // Stunned/Slowed dynamically
@@ -169,6 +170,25 @@ export class Game {
         gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.3);
         osc.start(this.audioCtx.currentTime);
         osc.stop(this.audioCtx.currentTime + 0.4);
+
+        if (this.lives <= 0) {
+            this.triggerGameOver();
+        }
+    }
+
+    triggerGameOver() {
+        if (!this.isRunning) return;
+        this.isRunning = false;
+
+        // Save to leaderboard
+        let lbStr = localStorage.getItem('cherryBlossomLeaderboard');
+        let lb = lbStr ? JSON.parse(lbStr) : [];
+        lb.push({ id: this.currentPlayerId, score: this.score });
+        lb.sort((a, b) => b.score - a.score);
+        lb = lb.slice(0, 100);
+        localStorage.setItem('cherryBlossomLeaderboard', JSON.stringify(lb));
+
+        if (this.onGameOver) this.onGameOver(this.score);
     }
 
     animate() {
@@ -187,22 +207,8 @@ export class Game {
             }
 
             this.player.update(delta);
-
-            this.timeLeft -= delta;
-            if (this.timeLeft <= 0) {
-                this.timeLeft = 0;
-                this.isRunning = false;
-                if (this.score > this.bestScore) {
-                    this.bestScore = this.score;
-                    localStorage.setItem('cherryBlossomBest', this.bestScore);
-                }
-                if (this.onTimeUpdate) this.onTimeUpdate(this.timeLeft);
-                if (this.onGameOver) this.onGameOver(this.score, this.bestScore);
-            } else {
-                if (this.onTimeUpdate) this.onTimeUpdate(this.timeLeft);
-            }
         } else {
-            this.camera.position.z -= 2.0 * delta;
+            this.camera.position.z -= 3.0 * delta;
         }
 
         this.environment.update(delta, this.camera.position);

@@ -20,18 +20,25 @@
 <body>
     <audio id="bgm" src="./bgm.mp3" loop autoplay></audio>
 
-    <div id="audio-control" title="Toggle Music">🔊</div>
+    <div id="audio-control-container">
+        <span style="font-size: 1.5rem; margin-right: 5px; color: white; text-shadow: 2px 2px 0 #cc5b7b; cursor: default;">🔊</span>
+        <input type="range" id="volume-slider" min="0.1" max="1.0" step="0.05" value="0.4" title="Volume Control">
+    </div>
 
     <div id="ui">
         <h1 id="title">Cherry Blossom Dreams</h1>
         <div id="start-screen">
             <p style="font-size: 1.5rem; color: #ffeb3b; margin-bottom: 20px;">🏆 Best Score: <span id="start-best-score">0</span></p>
+            <input type="text" id="player-id" placeholder="Enter Your ID" maxlength="15" autocomplete="off" />
             <p id="instructions">Click anywhere to start walking<br>(WASD to move, SPACE to jump, Mouse to look)</p>
         </div>
         <div id="game-over-screen" class="hidden">
-            <h2>Time's Up!</h2>
+            <h2>Game Over</h2>
             <p>You collected <span id="final-score">0</span> stars 🌟</p>
-            <p style="color: #ffeb3b;">🏆 Best Score: <span id="final-best-score">0</span></p>
+            <div id="leaderboard-container">
+                <h3>🏆 Global Leaderboard 🏆</h3>
+                <ul id="leaderboard-list"></ul>
+            </div>
             <p>Click to play again.</p>
         </div>
     </div>
@@ -39,7 +46,7 @@
     <div id="hud" class="hidden">
         <div id="score-display">🌟 <span id="score">0</span></div>
         <div id="combo-display" class="hidden"><span id="combo">0</span> Combo!</div>
-        <div id="time-display">⏱️ <span id="time">60</span>s</div>
+        <div id="lives-display">❤️ <span id="lives">3</span></div>
     </div>
 
     <!-- Loading Screen -->

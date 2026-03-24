@@ -10,6 +10,7 @@ export class Environment {
         this.createStreet();
         this.createTrees();
         this.createPetals();
+        this.createClouds();
         this.createStars();
         this.createStarParticles();
         this.createObstacles();
@@ -140,6 +141,45 @@ export class Environment {
             });
         }
         this.scene.add(this.petals);
+    }
+
+    createClouds() {
+        this.cloudCount = 18;
+        this.clouds = [];
+        
+        const geo = new THREE.SphereGeometry(1, 16, 16);
+        const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, flatShading: true });
+        
+        for (let i = 0; i < this.cloudCount; i++) {
+            const group = new THREE.Group();
+            
+            const sphereCount = 5 + Math.floor(Math.random() * 5);
+            for (let j = 0; j < sphereCount; j++) {
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 6,
+                    (Math.random() - 0.5) * 3,
+                    (Math.random() - 0.5) * 6
+                );
+                const s = 3 + Math.random() * 4;
+                mesh.scale.set(s, s * 0.6, s);
+                group.add(mesh);
+            }
+            
+            group.position.set(
+                (Math.random() - 0.5) * 300,
+                50 + Math.random() * 20,
+                100 - Math.random() * 400
+            );
+            
+            // Randomly drift left or right slowly
+            group.userData = {
+                vx: (Math.random() * 1.5 + 0.5) * (Math.random() < 0.5 ? 1 : -1)
+            };
+            
+            this.scene.add(group);
+            this.clouds.push(group);
+        }
     }
 
     createStars() {
@@ -294,6 +334,29 @@ export class Environment {
                 tree.position.z += 300;
                 const side = (Math.random() > 0.5) ? 1 : -1;
                 tree.position.x = side * (6 + Math.random() * 3);
+            }
+        }
+
+        if (this.clouds) {
+            for (let i = 0; i < this.cloudCount; i++) {
+                const cloud = this.clouds[i];
+                cloud.position.x += cloud.userData.vx * delta;
+                
+                // Wrap around X
+                if (cloud.position.x > playerPos.x + 200) {
+                    cloud.position.x = playerPos.x - 200;
+                } else if (cloud.position.x < playerPos.x - 200) {
+                    cloud.position.x = playerPos.x + 200;
+                }
+                
+                // Wrap around Z based on player movement
+                if (cloud.position.z > playerPos.z + 150) {
+                    cloud.position.z -= 350;
+                    cloud.position.x = playerPos.x + (Math.random() - 0.5) * 300;
+                } else if (cloud.position.z < playerPos.z - 250) {
+                    cloud.position.z += 350;
+                    cloud.position.x = playerPos.x + (Math.random() - 0.5) * 300;
+                }
             }
         }
 
