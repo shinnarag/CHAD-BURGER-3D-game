@@ -6,6 +6,8 @@ export class Player {
         this.camera = camera;
         this.camera.position.set(0, 1.6, 0);
 
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0);
+
         this.controls = new PointerLockControls(camera, document.body);
         scene.add(this.controls.getObject());
 
@@ -93,7 +95,12 @@ export class Player {
     }
 
     update(delta) {
-        if (!this.controls.isLocked) return;
+        if (!this.controls.isLocked && !this.isMobile) return;
+
+        if (this.isMobile) {
+            this.moveForward = true;
+            this.controls.getObject().rotation.set(0, 0, 0);
+        }
 
         this.velocity.x -= this.velocity.x * this.friction * delta;
         this.velocity.z -= this.velocity.z * this.friction * delta;

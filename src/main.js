@@ -88,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     game.onGameOver = (score) => {
-        document.exitPointerLock();
+        if (!game.player.isMobile) {
+            document.exitPointerLock();
+        }
         hud.classList.add('hidden');
         ui.classList.remove('hidden');
         startScreen.classList.add('hidden');
@@ -126,10 +128,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         game.start(playerId);
-        // Do not hide UI here, let pointerlockchange handle it on success
+        
+        if (game.player.isMobile) {
+            ui.classList.add('hidden');
+            hud.classList.remove('hidden');
+        }
     });
 
     document.addEventListener('pointerlockchange', () => {
+        if (game.player.isMobile) return;
+        
         if (document.pointerLockElement === document.body) {
             // Lock activated successfully
             ui.classList.add('hidden');
@@ -150,4 +158,31 @@ document.addEventListener('DOMContentLoaded', () => {
         // Do not switch screen completely, just inform the user
         console.warn("Pointer lock rejected by browser. Please wait a second before clicking again.");
     });
+    
+    // Mobile touch bindings
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const btnJump = document.getElementById('btn-jump');
+    const btnQuit = document.getElementById('btn-quit');
+
+    if (btnLeft) {
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); game.player.moveLeft = true; });
+        btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); game.player.moveLeft = false; });
+        
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); game.player.moveRight = true; });
+        btnRight.addEventListener('touchend', (e) => { e.preventDefault(); game.player.moveRight = false; });
+        
+        btnJump.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            if (game.player.canJump) {
+                game.player.velocity.y += game.player.jumpForce;
+                game.player.canJump = false;
+            }
+        });
+        
+        btnQuit.addEventListener('click', (e) => {
+            e.preventDefault();
+            game.triggerGameOver();
+        });
+    }
 });

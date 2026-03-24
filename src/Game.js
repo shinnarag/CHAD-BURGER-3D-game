@@ -96,9 +96,12 @@ export class Game {
 
         this.environment.resetStars(this.camera.position.z);
         if (this.environment.resetObstacles) this.environment.resetObstacles(this.camera.position.z);
-
+        // 시작 상태 설정
         this.isRunning = true;
-        this.player.lock();
+        
+        if (!this.player.isMobile) {
+            this.player.lock();
+        }
     }
 
     pause() {
