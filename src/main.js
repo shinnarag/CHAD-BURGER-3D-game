@@ -103,14 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const playerIdInput = document.getElementById('player-id');
         const playerId = playerIdInput.value.trim();
         
-        if (playerId === 'srep25220') {
-            if (confirm("정말로 리더보드를 초기화 하시겠습니까?")) {
+        if (playerId === 'srep25220' || playerId === 'sreo25220') {
+            if (confirm("정말로 모든 리더보드 스코어를 초기화 하시겠습니까?")) {
                 localStorage.removeItem('cherryBlossomLeaderboard');
                 localStorage.removeItem('cherryBlossomBest'); 
-                if (startBestScoreUI) startBestScoreUI.innerText = "0";
-                renderLeaderboard();
-                alert("리더보드가 초기화 되었습니다.");
-                playerIdInput.value = '';
+                alert("리더보드가 모두 초기화 되었습니다. 게임을 재시작합니다.");
+                location.reload();
             }
             return;
         }

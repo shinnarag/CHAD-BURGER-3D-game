@@ -151,7 +151,7 @@ export class Environment {
         
         for (let i = 0; i < this.cloudCount; i++) {
             const group = new THREE.Group();
-            const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, fog: false });
+            const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, fog: false, depthWrite: false });
             group.userData.mat = mat;
             
             const sphereCount = 5 + Math.floor(Math.random() * 5);
@@ -168,9 +168,9 @@ export class Environment {
             }
             
             group.position.set(
-                (Math.random() - 0.5) * 400,
+                (Math.random() - 0.5) * 800,
                 70 + Math.random() * 30,
-                100 - Math.random() * 400
+                100 - Math.random() * 800
             );
             
             // Randomly drift left or right slowly
@@ -352,28 +352,28 @@ export class Environment {
                 cloud.position.x += cloud.userData.vx * delta;
                 
                 // Wrap around X
-                if (cloud.position.x > playerPos.x + 200) {
-                    cloud.position.x = playerPos.x - 200;
-                } else if (cloud.position.x < playerPos.x - 200) {
-                    cloud.position.x = playerPos.x + 200;
+                if (cloud.position.x > playerPos.x + 400) {
+                    cloud.position.x = playerPos.x - 400;
+                } else if (cloud.position.x < playerPos.x - 400) {
+                    cloud.position.x = playerPos.x + 400;
                 }
                 
                 // Wrap around Z based on player movement
-                if (cloud.position.z > playerPos.z + 150) {
-                    cloud.position.z -= 350;
-                    cloud.position.x = playerPos.x + (Math.random() - 0.5) * 300;
+                if (cloud.position.z > playerPos.z + 200) {
+                    cloud.position.z -= 800;
+                    cloud.position.x = playerPos.x + (Math.random() - 0.5) * 600;
                     cloud.userData.mat.opacity = 0;
-                } else if (cloud.position.z < playerPos.z - 250) {
-                    cloud.position.z += 350;
-                    cloud.position.x = playerPos.x + (Math.random() - 0.5) * 300;
+                } else if (cloud.position.z < playerPos.z - 600) {
+                    cloud.position.z += 800;
+                    cloud.position.x = playerPos.x + (Math.random() - 0.5) * 600;
                     cloud.userData.mat.opacity = 0;
                 }
 
                 // Opacity fade in based on distance
                 const dist = cloud.position.distanceTo(playerPos);
-                let targetOp = 1.0 - (dist - 150) / 200;
+                let targetOp = 1.0 - (dist - 200) / 300;
                 if (targetOp < 0) targetOp = 0;
-                if (targetOp > 0.95) targetOp = 0.95;
+                if (targetOp > 0.8) targetOp = 0.8;
                 cloud.userData.mat.opacity = targetOp;
             }
         }
