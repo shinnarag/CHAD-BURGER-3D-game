@@ -174,6 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 강력한 Fallback: 데스크탑 및 모바일 버튼 터치 시 무조건 연동
     document.body.addEventListener('click', ensureAudio);
 
+    // 데스크탑 좌클릭 점프 지원
+    document.body.addEventListener('mousedown', (e) => {
+        if (game.isRunning && !game.player.isMobile && document.pointerLockElement === document.body) {
+            if (game.player.canJump) {
+                game.player.velocity.y += game.player.jumpForce;
+                game.player.canJump = false;
+            }
+        }
+    });
+
     // Mobile touch bindings
     const btnLeft = document.getElementById('btn-left');
     const btnRight = document.getElementById('btn-right');

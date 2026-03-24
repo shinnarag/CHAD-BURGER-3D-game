@@ -97,8 +97,10 @@ export class Player {
     update(delta) {
         if (!this.controls.isLocked && !this.isMobile) return;
 
+        // PC 데스크탑과 모바일 모두 게임 시작 시점부터 무조건 앞으로 달리도록 강제
+        this.moveForward = true;
+
         if (this.isMobile) {
-            this.moveForward = true;
             this.controls.getObject().rotation.set(0, 0, 0);
         }
 
