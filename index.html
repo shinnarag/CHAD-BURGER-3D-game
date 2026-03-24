@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Cherry Blossom Healing Game</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <audio id="bgm" src="./bgm.mp3" loop autoplay></audio>
+
+    <div id="audio-control" title="Toggle Music">🔊</div>
+
+    <div id="ui">
+        <h1 id="title">Cherry Blossom Dreams</h1>
+        <div id="start-screen">
+            <p style="font-size: 1.5rem; color: #ffeb3b; margin-bottom: 20px;">🏆 Best Score: <span id="start-best-score">0</span></p>
+            <p id="instructions">Click anywhere to start walking<br>(WASD to move, SPACE to jump, Mouse to look)</p>
+        </div>
+        <div id="game-over-screen" class="hidden">
+            <h2>Time's Up!</h2>
+            <p>You collected <span id="final-score">0</span> stars 🌟</p>
+            <p style="color: #ffeb3b;">🏆 Best Score: <span id="final-best-score">0</span></p>
+            <p>Click to play again.</p>
+        </div>
+    </div>
+
+    <div id="hud" class="hidden">
+        <div id="score-display">🌟 <span id="score">0</span></div>
+        <div id="combo-display" class="hidden"><span id="combo">0</span> Combo!</div>
+        <div id="time-display">⏱️ <span id="time">60</span>s</div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading" class="overlay">
+        <h2>Loading...</h2>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
