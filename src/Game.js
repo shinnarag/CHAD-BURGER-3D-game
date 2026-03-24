@@ -37,7 +37,7 @@ export class Game {
         this.scene.background = new THREE.Color(0x87CEEB);
         this.scene.fog = new THREE.FogExp2(0x87CEEB, 0.035);
 
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 600);
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -199,12 +199,14 @@ export class Game {
         this.isRunning = false;
 
         // Save to leaderboard
-        let lbStr = localStorage.getItem('cherryBlossomLeaderboard');
-        let lb = lbStr ? JSON.parse(lbStr) : [];
-        lb.push({ id: this.currentPlayerId, score: this.score });
-        lb.sort((a, b) => b.score - a.score);
-        lb = lb.slice(0, 100);
-        localStorage.setItem('cherryBlossomLeaderboard', JSON.stringify(lb));
+        if (this.score > 0) {
+            let lbStr = localStorage.getItem('cherryBlossomLeaderboard');
+            let lb = lbStr ? JSON.parse(lbStr) : [];
+            lb.push({ id: this.currentPlayerId, score: this.score });
+            lb.sort((a, b) => b.score - a.score);
+            lb = lb.slice(0, 100);
+            localStorage.setItem('cherryBlossomLeaderboard', JSON.stringify(lb));
+        }
 
         if (this.onGameOver) this.onGameOver(this.score);
     }
