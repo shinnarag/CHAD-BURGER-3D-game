@@ -1,60 +1,5 @@
 import { Game } from './Game.js';
 
-let ytPlayer = null;
-let ytReady = false;
-let playRequested = false;
-
-// 1. YouTube 주입 코드를 모듈 최상단에서 우선순위로 선언
-window.onYouTubeIframeAPIReady = function() {
-    ytPlayer = new YT.Player('youtube-player', {
-        height: '112',
-        width: '200',
-        videoId: 'XPpY5pTq6aI',
-        playerVars: {
-            'autoplay': 0, 
-            'controls': 1,
-            'disablekb': 1,
-            'fs': 0,
-            'loop': 1,
-            'playlist': 'XPpY5pTq6aI', 
-            'playsinline': 1,
-            'rel': 0,
-            'showinfo': 0,
-            'iv_load_policy': 3
-        },
-        events: {
-            'onReady': (event) => {
-                ytReady = true;
-                const vol = document.getElementById('volume-slider');
-                if (vol) {
-                    event.target.setVolume(parseFloat(vol.value) * 100);
-                }
-                if (playRequested) {
-                    event.target.playVideo();
-                }
-            },
-            'onStateChange': (event) => {
-                if (event.data === YT.PlayerState.ENDED) {
-                    event.target.playVideo(); 
-                }
-            },
-            'onError': (event) => {
-                console.error("YouTube Player Error Code:", event.data);
-                if (event.data === 101 || event.data === 150) {
-                    console.warn("This video owner does not allow embedding on other websites. Playback failed.");
-                    alert("해당 유튜브 영상은 저작권자가 '외부 웹사이트 재생'을 막아두어 재생할 수 없습니다.");
-                }
-            }
-        }
-    });
-};
-
-// 2. 동적으로 스크립트 로드 (race condition 방지, 구글 권장 방식)
-const tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-const firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // Audio Control Logic
@@ -65,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
             v = 0.1;
             e.target.value = 0.1;
         }
-        if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
-            ytPlayer.setVolume(v * 100);
+        if (window.ytPlayer && typeof window.ytPlayer.setVolume === 'function') {
+            window.ytPlayer.setVolume(v * 100);
         }
     });
 
@@ -172,14 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        playRequested = true;
+        window.ytPlayRequested = true;
         
         // Start YouTube Music upon user interaction
-        if (ytReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            ytPlayer.unMute();
-            const state = ytPlayer.getPlayerState();
+        if (window.ytReady && window.ytPlayer && typeof window.ytPlayer.playVideo === 'function') {
+            window.ytPlayer.unMute();
+            const state = window.ytPlayer.getPlayerState();
             if (state !== YT.PlayerState.PLAYING) {
-                ytPlayer.playVideo();
+                window.ytPlayer.playVideo();
             }
         }
         
@@ -215,6 +160,20 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Pointer lock rejected by browser. Please wait a second before clicking again.");
     });
     
+    // 모바일 터치 및 데스크탑 클릭 시 비디오 강제 실행 콜백
+    const ensureAudio = () => {
+        if (window.ytPlayRequested && window.ytReady && window.ytPlayer && typeof window.ytPlayer.playVideo === 'function') {
+            const state = window.ytPlayer.getPlayerState();
+            if (state !== YT.PlayerState.PLAYING) {
+                window.ytPlayer.unMute();
+                window.ytPlayer.playVideo();
+            }
+        }
+    };
+    
+    // 강력한 Fallback: 데스크탑 및 모바일 버튼 터치 시 무조건 연동
+    document.body.addEventListener('click', ensureAudio);
+
     // Mobile touch bindings
     const btnLeft = document.getElementById('btn-left');
     const btnRight = document.getElementById('btn-right');
@@ -222,6 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnQuit = document.getElementById('btn-quit');
 
     if (btnLeft) {
+        btnLeft.addEventListener('touchstart', ensureAudio);
+        btnRight.addEventListener('touchstart', ensureAudio);
+        btnJump.addEventListener('touchstart', ensureAudio);
+        
         btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); game.player.moveLeft = true; });
         btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); game.player.moveLeft = false; });
         
@@ -241,16 +204,4 @@ document.addEventListener('DOMContentLoaded', () => {
             game.triggerGameOver();
         });
     }
-
-    // 강력한 Fallback: 데스크탑 등에서 PointerLock 이후 클릭할 때 재생이 멈춰있으면 다시 시도
-    document.body.addEventListener('click', () => {
-        if (playRequested && ytReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            const state = ytPlayer.getPlayerState();
-            if (state !== YT.PlayerState.PLAYING) {
-                ytPlayer.unMute();
-                ytPlayer.playVideo();
-            }
-        }
-    });
-
 });

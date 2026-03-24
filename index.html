@@ -18,6 +18,52 @@
 </head>
 
 <body>
+    <script>
+        window.ytPlayer = null;
+        window.ytReady = false;
+        window.ytPlayRequested = false;
+
+        window.onYouTubeIframeAPIReady = function() {
+            window.ytPlayer = new YT.Player('youtube-player', {
+                height: '112',
+                width: '200',
+                videoId: 'XPpY5pTq6aI',
+                playerVars: {
+                    'autoplay': 0, 
+                    'controls': 1,
+                    'disablekb': 1,
+                    'fs': 0,
+                    'loop': 1,
+                    'playlist': 'XPpY5pTq6aI', 
+                    'playsinline': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'iv_load_policy': 3
+                },
+                events: {
+                    'onReady': (event) => {
+                        window.ytReady = true;
+                        const vol = document.getElementById('volume-slider');
+                        if (vol) {
+                            event.target.setVolume(parseFloat(vol.value) * 100);
+                        }
+                        if (window.ytPlayRequested) {
+                            event.target.playVideo();
+                        }
+                    },
+                    'onStateChange': (event) => {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            event.target.playVideo(); 
+                        }
+                    },
+                    'onError': (event) => {
+                        console.error("YouTube Player Error:", event.data);
+                    }
+                }
+            });
+        };
+    </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 
     <div id="audio-control-container" style="flex-direction: column; align-items: center;">
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px; width: 100%;">
