@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('player-id').classList.remove('input-error');
     });
     document.getElementById('player-id').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') startGame();
+        if (e.key === 'Enter' && !e.isComposing) startGame();
     });
 
     // Play 버튼 클릭
