@@ -191,6 +191,54 @@ h2 {
     background: white;
 }
 
+#player-id.input-error {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+#btn-play,
+#btn-replay {
+    font-family: inherit;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding: 12px 40px;
+    margin-top: 12px;
+    border: 3px solid white;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#btn-play:hover,
+#btn-replay:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 154, 158, 0.6);
+    background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
+}
+
+#btn-play:active,
+#btn-replay:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(255, 154, 158, 0.3);
+}
+
 #lives-display {
     position: absolute;
     right: 0;

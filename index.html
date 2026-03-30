@@ -90,9 +90,10 @@
         <h1 id="title">Cherry Blossom Dreams</h1>
         <div id="start-screen">
             <p style="font-size: 1.5rem; color: #ffeb3b; margin-bottom: 20px;">🏆 Best Score: <span id="start-best-score">0</span></p>
-            <input type="text" id="player-id" placeholder="닉네임 (선택사항)" maxlength="15" autocomplete="off" />
-            <p id="id-hint" style="font-size: 0.85rem; color: #ffe0b2; margin: 5px 0 10px 0; animation: none;">미입력 시 <strong>Guest</strong>로 플레이합니다</p>
-            <p id="instructions">Click anywhere to start walking<br>(WASD to move, SPACE to jump, Mouse to look)</p>
+            <input type="text" id="player-id" placeholder="닉네임을 입력하세요" maxlength="15" autocomplete="off" />
+            <p id="id-error" style="font-size: 0.9rem; color: #ff6b6b; margin: 5px 0 0 0; animation: none; display: none;">⚠️ 닉네임을 입력해주세요!</p>
+            <button id="btn-play">🌸 Play 🌸</button>
+            <p id="instructions">WASD to move, SPACE to jump, Mouse to look</p>
         </div>
         <div id="game-over-screen" class="hidden">
             <h2>Game Over</h2>
@@ -101,7 +102,7 @@
                 <h3>🏆 Global Leaderboard 🏆</h3>
                 <ul id="leaderboard-list"></ul>
             </div>
-            <p>Click to play again.</p>
+            <button id="btn-replay">🌸 다시하기 🌸</button>
         </div>
     </div>
 
