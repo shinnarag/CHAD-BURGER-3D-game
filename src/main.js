@@ -17,6 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const game = new Game();
 
+    // 저장된 플레이어 ID 불러오기
+    const savedId = localStorage.getItem('cherryBlossomPlayerId');
+    const playerIdInput = document.getElementById('player-id');
+    if (savedId && playerIdInput) {
+        playerIdInput.value = savedId;
+    }
+
     const ui = document.getElementById('ui');
     const loading = document.getElementById('loading');
     const startScreen = document.getElementById('start-screen');
@@ -98,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const playerIdInput = document.getElementById('player-id');
-        const playerId = playerIdInput.value.trim();
+        const playerIdInputEl = document.getElementById('player-id');
+        let playerId = playerIdInputEl.value.trim();
         
         if (playerId === 'srep25220' || playerId === 'sreo25220') {
             if (confirm("정말로 모든 리더보드 스코어를 초기화 하시겠습니까?")) {
@@ -111,10 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ID 미입력 시 Guest로 자동 설정 (팝업 없음)
         if (!playerId) {
-            alert("Please enter your ID to start!");
-            playerIdInput.focus();
-            return;
+            playerId = 'Guest';
+        }
+        
+        // 입력한 ID를 localStorage에 저장 (Guest가 아닌 경우만)
+        if (playerId !== 'Guest') {
+            localStorage.setItem('cherryBlossomPlayerId', playerId);
         }
         
         window.ytPlayRequested = true;
