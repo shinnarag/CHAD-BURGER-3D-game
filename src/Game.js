@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Player } from './Player.js?v=7';
 import { Environment } from './Environment.js?v=7';
+import { Leaderboard } from './Leaderboard.js';
 
 export class Game {
     constructor() {
@@ -203,14 +204,9 @@ export class Game {
         if (!this.isRunning) return;
         this.isRunning = false;
 
-        // Save to leaderboard
+        // Save to leaderboard (local + global Firebase if configured)
         if (this.score > 0) {
-            let lbStr = localStorage.getItem('cherryBlossomLeaderboard');
-            let lb = lbStr ? JSON.parse(lbStr) : [];
-            lb.push({ id: this.currentPlayerId, score: this.score, time: this.playTime });
-            lb.sort((a, b) => b.score - a.score);
-            lb = lb.slice(0, 100);
-            localStorage.setItem('cherryBlossomLeaderboard', JSON.stringify(lb));
+            Leaderboard.submitScore(this.currentPlayerId, this.score, this.playTime);
         }
 
         if (this.onGameOver) this.onGameOver(this.score);

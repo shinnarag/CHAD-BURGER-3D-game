@@ -1,4 +1,5 @@
 import { Game } from './Game.js?v=7';
+import { Leaderboard } from './Leaderboard.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -40,10 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const comboDisplay = document.getElementById('combo-display');
     const comboUI = document.getElementById('combo');
 
-    const renderLeaderboard = () => {
-        const lbStr = localStorage.getItem('cherryBlossomLeaderboard');
-        const lb = lbStr ? JSON.parse(lbStr) : [];
+    const renderLeaderboard = async () => {
         const lbList = document.getElementById('leaderboard-list');
+        lbList.innerHTML = '<li style="text-align:center; opacity:0.7;">🌸 불러오는 중...</li>';
+
+        const lb = await Leaderboard.getTopScores(100);
+
         lbList.innerHTML = '';
         lb.forEach((entry, idx) => {
             const li = document.createElement('li');
@@ -51,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
             li.innerHTML = `<span>#${idx+1} ${entry.id}</span><span>${entry.score} 🌟${timeStr}</span>`;
             lbList.appendChild(li);
         });
-        
-        if(lb.length > 0 && startBestScoreUI) {
+
+        if (lb.length > 0 && startBestScoreUI) {
             startBestScoreUI.innerText = lb[0].score;
         }
     };
@@ -101,15 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnReplay = document.getElementById('btn-replay');
     const idError = document.getElementById('id-error');
 
-    const startGame = () => {
+    const startGame = async () => {
         const playerIdInputEl = document.getElementById('player-id');
         let playerId = playerIdInputEl.value.trim();
         
         // 관리자 코드 처리
         if (playerId === 'srep25220' || playerId === 'sreo25220') {
             if (confirm("정말로 모든 리더보드 스코어를 초기화 하시겠습니까?")) {
-                localStorage.removeItem('cherryBlossomLeaderboard');
-                localStorage.removeItem('cherryBlossomBest'); 
+                await Leaderboard.clearAll();
                 alert("리더보드가 모두 초기화 되었습니다. 게임을 재시작합니다.");
                 location.reload();
             }

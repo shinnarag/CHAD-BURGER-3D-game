@@ -4,7 +4,7 @@
 // Firebase 프로젝트의 Realtime Database URL을 아래에 입력하세요.
 // 예: 'https://your-project-default-rtdb.firebaseio.com'
 // ============================================================
-const FIREBASE_DB_URL = '';
+const FIREBASE_DB_URL = 'https://chad-burger-3d-game-default-rtdb.firebaseio.com';
 
 export class Leaderboard {
 
