@@ -17,9 +17,9 @@ export class Leaderboard {
      * 글로벌 리더보드에 점수를 제출합니다.
      * Firebase 미설정 시 로컬 저장만 수행합니다.
      */
-    static async submitScore(playerId, score, playTime) {
+    static async submitScore(playerId, score, playTime, country = '') {
         // 항상 로컬에도 저장 (오프라인 백업)
-        this._saveLocal(playerId, score, playTime);
+        this._saveLocal(playerId, score, playTime, country);
 
         if (!this.isConfigured()) {
             console.warn('[Leaderboard] Firebase 미설정 — 로컬 저장만 수행');
@@ -30,6 +30,7 @@ export class Leaderboard {
             id: playerId,
             score: score,
             time: Math.floor(playTime),
+            country: country,
             timestamp: Date.now()
         };
 
@@ -96,9 +97,9 @@ export class Leaderboard {
 
     // === Private: localStorage 관련 ===
 
-    static _saveLocal(playerId, score, playTime) {
+    static _saveLocal(playerId, score, playTime, country = '') {
         let lb = JSON.parse(localStorage.getItem('cherryBlossomLeaderboard') || '[]');
-        lb.push({ id: playerId, score, time: playTime, timestamp: Date.now() });
+        lb.push({ id: playerId, score, time: playTime, country, timestamp: Date.now() });
         lb.sort((a, b) => b.score - a.score);
         lb = lb.slice(0, 100);
         localStorage.setItem('cherryBlossomLeaderboard', JSON.stringify(lb));

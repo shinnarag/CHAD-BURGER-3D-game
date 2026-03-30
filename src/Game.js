@@ -78,8 +78,9 @@ export class Game {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    start(playerId) {
+    start(playerId, country = '') {
         this.currentPlayerId = playerId;
+        this.currentCountry = country;
         this.lives = 3;
         this.score = 0;
         this.spawnHeart = false;
@@ -205,9 +206,9 @@ export class Game {
         this.isRunning = false;
 
         // Save to leaderboard (local + global Firebase if configured)
-        if (this.score > 0) {
-            Leaderboard.submitScore(this.currentPlayerId, this.score, this.playTime);
-        }
+        this._submitPromise = (this.score > 0)
+            ? Leaderboard.submitScore(this.currentPlayerId, this.score, this.playTime, this.currentCountry)
+            : Promise.resolve();
 
         if (this.onGameOver) this.onGameOver(this.score);
     }

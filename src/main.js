@@ -1,6 +1,17 @@
 import { Game } from './Game.js?v=7';
 import { Leaderboard } from './Leaderboard.js';
 
+// 국가 코드 → 국기 이모지 변환
+const toFlag = code => code
+    ? code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)))
+    : '';
+
+// IP 기반 국가 감지 (비동기, 실패해도 무시)
+let detectedCountry = '';
+fetch('https://api.country.is/').then(r => r.json()).then(d => {
+    if (d && d.country) detectedCountry = d.country;
+}).catch(() => {});
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // Audio Control Logic
@@ -51,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
         lb.forEach((entry, idx) => {
             const li = document.createElement('li');
             const timeStr = entry.time ? ` (${Math.floor(entry.time)}s)` : '';
-            li.innerHTML = `<span>#${idx+1} ${entry.id}</span><span>${entry.score} 🌟${timeStr}</span>`;
+            const flag = entry.country ? `${toFlag(entry.country)} ${entry.country} ` : '';
+            li.innerHTML = `<span>#${idx+1} ${flag}${entry.id}</span><span>${entry.score} 🌟${timeStr}</span>`;
             lbList.appendChild(li);
         });
 
@@ -87,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    game.onGameOver = (score) => {
+    game.onGameOver = async (score) => {
         if (!game.player.isMobile) {
             document.exitPointerLock();
         }
@@ -96,7 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
         startScreen.classList.add('hidden');
         gameOverScreen.classList.remove('hidden');
         finalScoreUI.innerText = score;
-        renderLeaderboard();
+        renderLeaderboard(); // 로컬 데이터 즉시 표시
+        if (game._submitPromise) {
+            await game._submitPromise; // Firebase 제출 완료 대기
+            renderLeaderboard(); // 글로벌 데이터로 갱신
+        }
     };
 
     // === 게임 시작 로직 (Play 버튼 전용) ===
@@ -148,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        game.start(playerId);
+        game.start(playerId, detectedCountry);
         
         if (game.player.isMobile) {
             ui.classList.add('hidden');
