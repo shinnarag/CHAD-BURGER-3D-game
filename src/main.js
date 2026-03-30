@@ -96,18 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderLeaderboard();
     };
 
-    ui.addEventListener('click', (e) => {
-        if (e.target.id === 'volume-slider') return; // Ignore clicks on the volume slider
-        
-        if (!gameOverScreen.classList.contains('hidden')) {
-            gameOverScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-            return;
-        }
+    // === 게임 시작 로직 (Play 버튼 전용) ===
+    const btnPlay = document.getElementById('btn-play');
+    const btnReplay = document.getElementById('btn-replay');
+    const idError = document.getElementById('id-error');
 
+    const startGame = () => {
         const playerIdInputEl = document.getElementById('player-id');
         let playerId = playerIdInputEl.value.trim();
         
+        // 관리자 코드 처리
         if (playerId === 'srep25220' || playerId === 'sreo25220') {
             if (confirm("정말로 모든 리더보드 스코어를 초기화 하시겠습니까?")) {
                 localStorage.removeItem('cherryBlossomLeaderboard');
@@ -118,15 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // ID 미입력 시 Guest로 자동 설정 (팝업 없음)
+        // ID 필수 입력 검증 (팝업 없이 인라인 에러 표시)
         if (!playerId) {
-            playerId = 'Guest';
+            idError.style.display = 'block';
+            playerIdInputEl.classList.add('input-error');
+            playerIdInputEl.focus();
+            // 에러 애니메이션 후 클래스 제거
+            setTimeout(() => {
+                playerIdInputEl.classList.remove('input-error');
+            }, 400);
+            return;
         }
+
+        // 에러 표시 숨기기
+        idError.style.display = 'none';
+        playerIdInputEl.classList.remove('input-error');
         
-        // 입력한 ID를 localStorage에 저장 (Guest가 아닌 경우만)
-        if (playerId !== 'Guest') {
-            localStorage.setItem('cherryBlossomPlayerId', playerId);
-        }
+        // 입력한 ID를 localStorage에 저장
+        localStorage.setItem('cherryBlossomPlayerId', playerId);
         
         window.ytPlayRequested = true;
         
@@ -145,6 +152,28 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.classList.add('hidden');
             hud.classList.remove('hidden');
         }
+    };
+
+    // 입력 시 에러 표시 자동 해제 + Enter 키로 시작
+    document.getElementById('player-id').addEventListener('input', () => {
+        idError.style.display = 'none';
+        document.getElementById('player-id').classList.remove('input-error');
+    });
+    document.getElementById('player-id').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') startGame();
+    });
+
+    // Play 버튼 클릭
+    btnPlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startGame();
+    });
+
+    // 다시하기 버튼 클릭
+    btnReplay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        gameOverScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
     });
 
     document.addEventListener('pointerlockchange', () => {

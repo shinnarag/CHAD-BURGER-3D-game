@@ -29,7 +29,6 @@ body {
     color: white;
     text-shadow: 2px 2px 0 #cc5b7b;
     z-index: 10;
-    cursor: pointer;
     background: rgba(255, 183, 197, 0.4);
     padding: 40px;
     border-radius: 20px;
